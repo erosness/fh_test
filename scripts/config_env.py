@@ -2,14 +2,14 @@ import sys
 
 def set_deb_control(version , arch):
     file_name  = "./package/debian/DEBIAN/control"
-    template = "Package: tpflow\n"
+    template = "Package: thingsplex_service_template\n"
     template+= "Version: "+version+"\n"
-    template+= "Replaces: tpflow\n"
+    template+= "Replaces: thingsplex_service_template\n"
     template+= "Section: non-free/misc\n"
     template+= "Priority: optional\n"
     template+= "Architecture: "+arch+"\n"
     template+= "Maintainer: Aleksandrs Livincovs <aleksandrs.livincovs@gmail.com>\n"
-    template+= "Description: Thingplex TpFlow is IoT rule and flow engine.\n"
+    template+= "Description: .\n"
 
     f = open(file_name,"w")
     f.write(template)
