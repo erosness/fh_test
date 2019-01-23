@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/alivinco/thingsplex_service_template/model"
 	"github.com/futurehomeno/fimpgo"
 	"gopkg.in/natefinch/lumberjack.v2"

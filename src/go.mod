@@ -1,9 +1,9 @@
 module github.com/alivinco/thingsplex_service_template
 
-replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.3.0
-
 require (
-	github.com/futurehomeno/fimpgo v1.1.2 // indirect
-	github.com/sirupsen/logrus v1.3.0 // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
+	github.com/BurntSushi/toml v0.3.1 // indirect
+	github.com/futurehomeno/fimpgo v1.1.3
+	github.com/sirupsen/logrus v1.3.0
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	gopkg.in/yaml.v2 v2.2.2 // indirect
 )

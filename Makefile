@@ -10,7 +10,7 @@ build-go:
 	go build -o thingsplex_service_template src/service.go
 
 build-go-arm:
-	GOOS=linux GOARCH=arm GOARM=6 go build -o thingsplex_service_template src/service.go
+	cd ./src;GOOS=linux GOARCH=arm GOARM=6 go build -o thingsplex_service_template src/service.go;cd ../
 
 build-go-amd:
 	GOOS=linux GOARCH=amd64 go build -o thingsplex_service_template src/service.go
