@@ -25,11 +25,18 @@ def rename_file(old_file_path,new_name):
 
 def rename_files(new_service_name,git_account):
     for root, dirs, files in os.walk("../"+new_service_name):
+        for filename in dirs:
+            full_path = root+"/"+filename
+            full_path = rename_file(full_path,new_service_name)
+            print(full_path)
+
+    for root, dirs, files in os.walk("../"+new_service_name):
         for filename in files:
             full_path = root+"/"+filename
             full_path = rename_file(full_path,new_service_name)
             print(full_path)
             replace_in_file(full_path,new_service_name,git_account)
+
 
 
 if __name__ == "__main__":
