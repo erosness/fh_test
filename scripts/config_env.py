@@ -1,7 +1,6 @@
 import sys
 
-def set_deb_control(version , arch):
-    file_name  = "./package/debian/DEBIAN/control"
+def set_deb_control(version , arch,file_name):
     template = "Package: thingsplex_service_template\n"
     template+= "Version: "+version+"\n"
     template+= "Replaces: thingsplex_service_template\n"
@@ -27,5 +26,6 @@ if __name__ == "__main__":
    environment = sys.argv[1] 
    version = sys.argv[2]
    arch = sys.argv[3]
-   set_deb_control(version,arch)
+   set_deb_control(version,arch,"./package/debian_fh/DEBIAN/control")
+   set_deb_control(version,arch,"./package/debian_tp/DEBIAN/control")
    set_version_file(version)

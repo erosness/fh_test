@@ -4,7 +4,7 @@
   "mqtt_client_id_prefix":"thingsplex_service_template",
   "mqtt_server_username":"",
   "mqtt_server_password":"",
-  "log_file": "",
+  "log_file": "/var/log/futurehome/thingsplex_service_template",
   "log_level": "debug",
   "log_format": "text"
 }

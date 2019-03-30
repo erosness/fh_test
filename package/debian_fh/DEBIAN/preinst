@@ -17,7 +17,7 @@ set -e
 case "$1" in
 	install|upgrade)
 		# Stop service if vinculum is running
-		if [ -d /opt/thingsplex/things_plex_service_template ]
+		if [ -d /usr/bin/things_plex_service_template ]
 		then
 			systemctl stop things_plex_service_template.service
 		fi
