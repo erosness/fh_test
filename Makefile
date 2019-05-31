@@ -53,7 +53,7 @@ deb-amd : configure-amd64 build-go-amd package-deb-doc-tp
 	mv debian.deb thingsplex_service_template_$(version)_amd64.deb
 
 run :
-	cd ./src; go run service.go -c testdata/var/config.json;cd ../
+	cd ./src; go run service.go -c testdata/config.json;cd ../
 
 
 .phony : clean

@@ -5,7 +5,7 @@ SERVICE_NAME_TEMPLATE = "thingsplex_service_template"
 
 
 def replace_in_file(file_name,new_name,git_account):
-    with open(file_name) as f:
+    with open(file_name, errors='ignore') as f:
         new_text=f.read().replace(SERVICE_NAME_TEMPLATE, new_name)
         if ("go.mod" in file_name) and (git_account!=""):
             new_text = new_text.replace("github.com/alivinco",git_account)
