@@ -1,19 +1,19 @@
-version="0.10.6"
+version="0.0.1"
 version_file=VERSION
 working_dir=$(shell pwd)
 arch="armhf"
 
 clean:
-	-rm tpflow
+	-rm thingsplex_service_template
 
 build-go:
-	go build -o thingsplex_service_template src/service.go
+	cd ./src;go build -o thingsplex_service_template service.go;cd ../
 
 build-go-arm:
-	cd ./src;GOOS=linux GOARCH=arm GOARM=6 go build -o thingsplex_service_template service.go;cd ../
+	cd ./src;GOOS=linux GOARCH=arm GOARM=6 go build -ldflags="-s -w" -o thingsplex_service_template service.go;cd ../
 
 build-go-amd:
-	cd ./src;GOOS=linux GOARCH=amd64 go build -o thingsplex_service_template src/service.go;cd ../
+	cd ./src;GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o thingsplex_service_template service.go;cd ../
 
 
 configure-arm:
@@ -43,9 +43,6 @@ package-deb-doc-fh:
 	@echo "Done"
 
 
-tar-arm: build-js build-go-arm package-deb-doc-2
-	@echo "The application was packaged into tar archive "
-
 deb-arm-fh : clean configure-arm build-go-arm package-deb-doc-fh
 	mv package/debian_fh.deb package/build/thingsplex_service_template_$(version)_armhf.deb
 
@@ -56,7 +53,7 @@ deb-amd : configure-amd64 build-go-amd package-deb-doc-tp
 	mv debian.deb thingsplex_service_template_$(version)_amd64.deb
 
 run :
-	go run src/service.go -c testdata/var/config.json
+	cd ./src; go run service.go -c testdata/config.json;cd ../
 
 
 .phony : clean

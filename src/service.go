@@ -67,6 +67,7 @@ func main() {
 	}else {
 		log.Info("Connected")
 	}
+
 	mqtt.Stop()
 	time.Sleep(10*time.Second)
 	select {
