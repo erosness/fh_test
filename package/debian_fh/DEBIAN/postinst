@@ -6,7 +6,7 @@ then
   groupadd -r futurehome || true
   groupadd -r thingsplex_service_template || true
 
-  useradd -r -N -M -d / -s /bin/false -g thingsplex_service_template tithingsplex_service_templatebber || true
+  useradd -r -N -M -d / -s /bin/false -g thingsplex_service_template thingsplex_service_template || true
 
   chown -R thingsplex_service_template:futurehome /var/log/futurehome/thingsplex_service_template/ || true
   chown -R thingsplex_service_template:thingsplex_service_template /var/lib/futurehome/thingsplex_service_template/ || true

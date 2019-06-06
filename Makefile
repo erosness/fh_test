@@ -4,16 +4,16 @@ working_dir=$(shell pwd)
 arch="armhf"
 
 clean:
-	-rm tpflow
+	-rm thingsplex_service_template
 
 build-go:
 	cd ./src;go build -o thingsplex_service_template service.go;cd ../
 
 build-go-arm:
-	cd ./src;GOOS=linux GOARCH=arm GOARM=6 go build -o thingsplex_service_template service.go;cd ../
+	cd ./src;GOOS=linux GOARCH=arm GOARM=6 go build -ldflags="-s -w" -o thingsplex_service_template service.go;cd ../
 
 build-go-amd:
-	cd ./src;GOOS=linux GOARCH=amd64 go build -o thingsplex_service_template src/service.go;cd ../
+	cd ./src;GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o thingsplex_service_template service.go;cd ../
 
 
 configure-arm:
