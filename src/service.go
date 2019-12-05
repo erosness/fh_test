@@ -1,14 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/alivinco/thingsplex_service_template/model"
 	"github.com/futurehomeno/fimpgo"
+	"github.com/futurehomeno/fimpgo/discovery"
 	log "github.com/sirupsen/logrus"
+	"github.com/thingsplex/thingsplex_service_template/model"
+	"github.com/thingsplex/thingsplex_service_template/router"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"io/ioutil"
 	"time"
 )
 
@@ -38,7 +38,6 @@ func SetupLog(logfile string, level string, logFormat string) {
 }
 
 func main() {
-	configs := model.Configs{}
 	var configFile string
 	flag.StringVar(&configFile, "c", "", "Config file")
 	flag.Parse()
@@ -47,8 +46,9 @@ func main() {
 	} else {
 		fmt.Println("Loading configs from file ", configFile)
 	}
-	configFileBody, err := ioutil.ReadFile(configFile)
-	err = json.Unmarshal(configFileBody, &configs)
+	appLifecycle := model.NewAppLifecycle()
+	configs := model.NewConfigs(configFile)
+	err := configs.LoadFromFile()
 	if err != nil {
 		fmt.Print(err)
 		panic("Can't load config file.")
@@ -56,21 +56,41 @@ func main() {
 
 	SetupLog(configs.LogFile, configs.LogLevel, configs.LogFormat)
 	log.Info("--------------Starting thingsplex_service_template----------------")
+	appLifecycle.PublishEvent(model.EventConfiguring, "main", nil)
 
-	mqtt := fimpgo.NewMqttTransport(configs.MqttServerURI,configs.MqttClientIdPrefix,configs.MqttUsername,configs.MqttPassword,true,1,1)
+	mqtt := fimpgo.NewMqttTransport(configs.MqttServerURI, configs.MqttClientIdPrefix, configs.MqttUsername, configs.MqttPassword, true, 1, 1)
 	err = mqtt.Start()
+	responder := discovery.NewServiceDiscoveryResponder(mqtt)
+	responder.RegisterResource(model.GetDiscoveryResource())
+	responder.Start()
+
+	fimpRouter := router.NewFromFimpRouter(mqtt,appLifecycle,configs)
+	fimpRouter.Start()
+
+	//------------------ Sample code --------------------------------------
+
 	msg := fimpgo.NewFloatMessage("evt.sensor.report", "temp_sensor", float64(35.5), nil, nil, nil)
 	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeDevice, ResourceName: "thingsplex_service_template", ResourceAddress: "1", ServiceName: "temp_sensor", ServiceAddress: "300"}
-	mqtt.Publish(&adr,msg)
+	mqtt.Publish(&adr, msg)
 	if err != nil {
-		log.Error("Can't connect to broker. Error:",err.Error())
-	}else {
+		log.Error("Can't connect to broker. Error:", err.Error())
+	} else {
 		log.Info("Connected")
+	}
+	//------------------ Sample code --------------------------------------
+
+	for {
+		appLifecycle.WaitForState("main", model.StateRunning)
+		// Configure custom resources here
+		//if err := conFimpRouter.Start(); err !=nil {
+		//	appLifecycle.PublishEvent(model.EventConfigError,"main",nil)
+		//}else {
+		//	appLifecycle.WaitForState(model.StateConfiguring,"main")
+		//}
+		//TODO: Add logic here
+		appLifecycle.WaitForState(model.StateConfiguring,"main")
 	}
 
 	mqtt.Stop()
-	time.Sleep(10*time.Second)
-	select {
-
-	}
+	time.Sleep(5 * time.Second)
 }
