@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const ServiceName  = "thingsplex_service_template"
+
 type Configs struct {
 	path                  string
 	InstanceAddress       string `json:"instance_address"`

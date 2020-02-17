@@ -28,6 +28,11 @@ func GetDiscoveryResource() discovery.Resource {
 		Version:   "1",
 	}, {
 		Type:      "in",
+		MsgType:   "cmd.log.set_level",
+		ValueType: "string",
+		Version:   "1",
+	}, {
+		Type:      "in",
 		MsgType:   "cmd.auth.login",
 		ValueType: "str_map", // username/password
 		Version:   "1",
@@ -51,16 +56,11 @@ func GetDiscoveryResource() discovery.Resource {
 		MsgType:   "evt.network.all_nodes_report",
 		ValueType: "object",
 		Version:   "1",
-	}, {
-		Type:      "in",
-		MsgType:   "cmd.log.set_level",
-		ValueType: "string",
-		Version:   "1",
 	}}
 
 	adService := fimptype.Service{
-		Name:             "conbee",
-		Alias:            "Network managment",
+		Name:             ServiceName,
+		Alias:            "Network management",
 		Address:          "/rt:ad/rn:thingsplex_service_template/ad:1",
 		Enabled:          true,
 		Groups:           []string{"ch_0"},
@@ -69,7 +69,7 @@ func GetDiscoveryResource() discovery.Resource {
 		Interfaces:       adInterfaces,
 	}
 	return discovery.Resource{
-		ResourceName:           "thingsplex_service_template",
+		ResourceName:           ServiceName,
 		ResourceType:           discovery.ResourceTypeAd,
 		Author:                 "your email",
 		IsInstanceConfigurable: false,

@@ -1,13 +1,12 @@
 package router
 
 import (
+	"fmt"
 	"github.com/futurehomeno/fimpgo"
 	log "github.com/sirupsen/logrus"
 	"github.com/thingsplex/thingsplex_service_template/model"
 	"strings"
 )
-
-const ServiceName  = "thingsplex_service_template"
 
 type FromFimpRouter struct {
 	inboundMsgCh fimpgo.MessageCh
@@ -24,8 +23,15 @@ func NewFromFimpRouter(mqt *fimpgo.MqttTransport,appLifecycle *model.Lifecycle,c
 }
 
 func (fc *FromFimpRouter) Start() {
-	fc.mqt.Subscribe("pt:j1/+/rt:dev/rn:thingsplex_service_template/ad:1/#")
-	fc.mqt.Subscribe("pt:j1/+/rt:ad/rn:cthingsplex_service_template/ad:1")
+	//TODO: Choose either adapter or app topic
+
+	// Adapter topics
+	fc.mqt.Subscribe(fmt.Sprintf("pt:j1/+/rt:dev/rn:%s/ad:1/#",model.ServiceName))
+	fc.mqt.Subscribe(fmt.Sprintf("pt:j1/+/rt:ad/rn:%s/ad:1",model.ServiceName))
+
+	// App topics
+	// fc.mqt.Subscribe(fmt.Sprintf("pt:j1/+/rt:app/rn:%s/ad:1",ServiceName))
+
 	go func(msgChan fimpgo.MessageCh) {
 		for  {
 			select {
@@ -59,8 +65,8 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 		log.Debug("Sending switch")
 		//val,_ := newMsg.Payload.GetBoolValue()
 		// TODO: Add your logic here
-	case ServiceName:
-		adr := &fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: ServiceName, ResourceAddress:"1"}
+	case model.ServiceName:
+		adr := &fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: model.ServiceName, ResourceAddress:"1"}
 		switch newMsg.Payload.Type {
 		case "cmd.auth.login":
 			reqVal, err := newMsg.Payload.GetStrMapValue()
@@ -78,18 +84,38 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 			if err != nil {
 				status = "error"
 			}
-			msg := fimpgo.NewStringMessage("evt.system.login_report",ServiceName,status,nil,nil,newMsg.Payload)
+			msg := fimpgo.NewStringMessage("evt.system.login_report",model.ServiceName,status,nil,nil,newMsg.Payload)
 			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
 				fc.mqt.Publish(adr,msg)
 			}
 		case "cmd.system.get_connect_params":
 			val := map[string]string{"host":"","username":"","password":""}
-			msg := fimpgo.NewStrMapMessage("evt.system.connect_params_report",ServiceName,val,nil,nil,newMsg.Payload)
+			msg := fimpgo.NewStrMapMessage("evt.system.connect_params_report",model.ServiceName,val,nil,nil,newMsg.Payload)
 			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
 				fc.mqt.Publish(adr,msg)
 			}
+
 		case "cmd.config.set":
-			fallthrough
+			configs , err :=newMsg.Payload.GetStrMapValue()
+			if err != nil {
+				return
+			}
+			log.Debugf("App reconfigured . New parameters : %v",configs)
+			//TODO: Add your logic here
+
+		case "cmd.log.set_level":
+			level , err :=newMsg.Payload.GetStringValue()
+			if err != nil {
+				return
+			}
+			logLevel, err := log.ParseLevel(level)
+			if err == nil {
+				log.SetLevel(logLevel)
+				fc.configs.LogLevel = level
+				fc.configs.SaveToFile()
+			}
+			log.Info("Log level updated to = ",logLevel)
+
 		case "cmd.system.connect":
 			_, err := newMsg.Payload.GetStrMapValue()
 			var errStr string
@@ -110,7 +136,7 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 				status = "error"
 			}
 			val := map[string]string{"status":status,"error":errStr}
-			msg := fimpgo.NewStrMapMessage("evt.system.connect_report",ServiceName,val,nil,nil,newMsg.Payload)
+			msg := fimpgo.NewStrMapMessage("evt.system.connect_report",model.ServiceName,val,nil,nil,newMsg.Payload)
 			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
 				fc.mqt.Publish(adr,msg)
 			}
