@@ -48,6 +48,10 @@ package-deb-doc-fh:clean-deb
 	docker run --rm -v ${working_dir}:/build -w /build --name debuild debian dpkg-deb --build package/debian_fh
 	@echo "Done"
 
+package-docker-amd:build-go-amd
+	cp ./src/thingsplex_service_template package/docker/service
+	cd ./package/docker;docker build -t thingsplex_service_template .
+
 deb-arm-fh : clean configure-arm build-go-arm package-deb-doc-fh
 	@echo "Building Futurehome ARM package"
 	mv package/debian_fh.deb package/build/thingsplex_service_template_$(version)_armhf.deb

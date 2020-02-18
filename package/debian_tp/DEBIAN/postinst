@@ -15,7 +15,7 @@ fi
 deb-systemd-helper unmask thingsplex_service_template.service >/dev/null || true
 
 if deb-systemd-helper --quiet was-enabled thingsplex_service_template.service; then
-  deb-systemd-helper enable thingsplex_service_template.service >/dev/null || true
+  systemctl enable thingsplex_service_template.service || true
 else
   deb-systemd-helper update-state thingsplex_service_template.service >/dev/null || true
 fi
