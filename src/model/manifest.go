@@ -14,6 +14,7 @@ type Manifest struct {
 	InitFlow []string      `json:"init_flow"`
 	Services []AppServices `json:"services"`
 	AppState AppStates     `json:"app_state"`
+	ConfigState interface{}`json:"config_state"`
 }
 
 type AppConfig struct {

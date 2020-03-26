@@ -34,7 +34,6 @@ func SetupLog(logfile string, level string, logFormat string) {
 		}
 		log.SetOutput(&l)
 	}
-
 }
 
 func main() {
