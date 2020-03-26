@@ -1,7 +1,0 @@
-Package: thingsplex_service_template
-Version: 0.10.6
-Section: non-free/misc
-Priority: optional
-Architecture: armhf
-Maintainer: Aleksandrs Livincovs <aleksandrs.livincovs@gmail.com>
-Description: thingsplex_service_template futurehome adapter.

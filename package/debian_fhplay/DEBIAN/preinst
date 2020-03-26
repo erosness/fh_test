@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+if [ -d /run/systemd/system ]; then
+  systemctl --system daemon-reload >/dev/null || true
+fi
+
+if [ "$1" = "remove" ]; then
+  if [ -x "/usr/bin/deb-systemd-helper" ]; then
+    deb-systemd-helper mask thingsplex_service_template.service >/dev/null
+  fi
+fi
+
+if [ "$1" = "purge" ]; then
+  rm -rf /var/lib/futurehome/thingsplex_service_template/data
+  
+  if [ -x "/usr/bin/deb-systemd-helper" ]; then
+    deb-systemd-helper purge thingsplex_service_template.service >/dev/null
+    deb-systemd-helper unmask thingsplex_service_template.service >/dev/null
+  fi
+fi

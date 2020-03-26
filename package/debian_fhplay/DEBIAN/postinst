@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "configure" ]
+then
+  groupadd -r thingsplex || true
+  groupadd -r thingsplex_service_template || true
+
+  useradd -r -N -M -d / -s /bin/false -g thingsplex thingsplex_service_template || true
+
+  chown -R thingsplex_service_template:thingsplex /var/log/thingsplex/thingsplex_service_template/ || true
+  chown -R thingsplex_service_template:thingsplex_service_template /opt/thingsplex/thingsplex_service_template/ || true
+fi
+
+deb-systemd-helper unmask thingsplex_service_template.service >/dev/null || true
+
+if deb-systemd-helper --quiet was-enabled thingsplex_service_template.service; then
+  systemctl enable thingsplex_service_template.service || true
+else
+  deb-systemd-helper update-state thingsplex_service_template.service >/dev/null || true
+fi
+
+if [ -d /run/systemd/system ]; then
+  systemctl --system daemon-reload >/dev/null || true
+
+  if [ -n "$2" ]; then
+    deb-systemd-invoke try-restart thingsplex_service_template.service >/dev/null || true
+  else
+    deb-systemd-invoke start thingsplex_service_template.service >/dev/null || true
+  fi
+fi

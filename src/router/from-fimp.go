@@ -164,6 +164,12 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 				log.Error("Incorrect address")
 
 			}
+		case "cmd.state.get_full_report":
+			val := map[string]string{"app":string(fc.appLifecycle.CurrentState()),"connection":string(fc.appLifecycle.ConnectivityState())}
+			msg := fimpgo.NewStrMapMessage("evt.state.full_report",model.ServiceName,val,nil,nil,newMsg.Payload)
+			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
+				fc.mqt.Publish(adr,msg)
+			}
 
 		}
 		//
