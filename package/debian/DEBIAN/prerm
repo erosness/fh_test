@@ -4,4 +4,5 @@ set -e
 if [ -d /run/systemd/system ] && [ "$1" = remove ]; then
   deb-systemd-invoke stop thingsplex_service_template.service >/dev/null
   systemctl disable thingsplex_service_template.service || true
+  rm /var/log/thingsplex/thingsplex_service_template/* || true
 fi

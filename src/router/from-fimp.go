@@ -23,6 +23,7 @@ func NewFromFimpRouter(mqt *fimpgo.MqttTransport,appLifecycle *model.Lifecycle,c
 }
 
 func (fc *FromFimpRouter) Start() {
+
 	//TODO: Choose either adapter or app topic
 
 	// Adapter topics
@@ -30,7 +31,7 @@ func (fc *FromFimpRouter) Start() {
 	fc.mqt.Subscribe(fmt.Sprintf("pt:j1/+/rt:ad/rn:%s/ad:1",model.ServiceName))
 
 	// App topics
-	// fc.mqt.Subscribe(fmt.Sprintf("pt:j1/+/rt:app/rn:%s/ad:1",ServiceName))
+	fc.mqt.Subscribe(fmt.Sprintf("pt:j1/+/rt:app/rn:%s/ad:1",model.ServiceName))
 
 	go func(msgChan fimpgo.MessageCh) {
 		for  {
@@ -52,56 +53,89 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 		addr = strings.Replace(addr,"l","",1)
 		switch newMsg.Payload.Type {
 		case "cmd.binary.set":
-			//val,_ := newMsg.Payload.GetBoolValue()
-			// TODO: Add your logic here
-
-			//log.Debug("Status code = ",respH.StatusCode)
+			// TODO: This is example . Add your logic here or remove
 		case "cmd.lvl.set":
-			//val,_ := newMsg.Payload.GetIntValue()
-			// TODO: Add your logic here
+			// TODO: This is an example . Add your logic here or remove
 		}
-
 	case "out_bin_switch":
 		log.Debug("Sending switch")
-		//val,_ := newMsg.Payload.GetBoolValue()
-		// TODO: Add your logic here
+		// TODO: This is an example . Add your logic here or remove
 	case model.ServiceName:
 		adr := &fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: model.ServiceName, ResourceAddress:"1"}
 		switch newMsg.Payload.Type {
 		case "cmd.auth.login":
-			reqVal, err := newMsg.Payload.GetStrMapValue()
-			status := "ok"
+			authReq := model.Login{}
+			err := newMsg.Payload.GetObjectValue(&authReq)
 			if err != nil {
 				log.Error("Incorrect login message ")
 				return
 			}
-			username,_ := reqVal["username"]
-			password,_ := reqVal["password"]
-			if username != "" && password != ""{
-				// TODO: Add your logic here
+			status := model.AuthStatus{
+				Status:    "AUTHENTICATED",
+				ErrorText: "",
+				ErrorCode: "",
 			}
-			fc.configs.SaveToFile()
-			if err != nil {
-				status = "error"
+			if authReq.Username != "" && authReq.Password != ""{
+				// TODO: This is an example . Add your logic here or remove
+			}else {
+				status.Status = "ERROR"
+				status.ErrorText = "Empty username or password"
 			}
-			msg := fimpgo.NewStringMessage("evt.system.login_report",model.ServiceName,status,nil,nil,newMsg.Payload)
+
+			msg := fimpgo.NewMessage("evt.system.status_report",model.ServiceName,fimpgo.VTypeObject,status,nil,nil,newMsg.Payload)
 			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
-				fc.mqt.Publish(adr,msg)
-			}
-		case "cmd.system.get_connect_params":
-			val := map[string]string{"host":"","username":"","password":""}
-			msg := fimpgo.NewStrMapMessage("evt.system.connect_params_report",model.ServiceName,val,nil,nil,newMsg.Payload)
-			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
+				// if response topic is not set , sending back to default application event topic
 				fc.mqt.Publish(adr,msg)
 			}
 
-		case "cmd.config.set":
-			configs , err :=newMsg.Payload.GetStrMapValue()
+		case "cmd.app.get_manifest":
+			mode,err := newMsg.Payload.GetStringValue()
 			if err != nil {
+				log.Error("Incorrect request format ")
 				return
 			}
-			log.Debugf("App reconfigured . New parameters : %v",configs)
-			//TODO: Add your logic here
+			manifest := model.NewManifest()
+			manifest.LoadFromFile("./defaults/app-manifest.json")
+			if mode == "manifest_and_states" {
+				manifest.AppState = *fc.appLifecycle.GetAllStates()
+			}
+			msg := fimpgo.NewMessage("evt.app.manifest_report",model.ServiceName,fimpgo.VTypeObject,manifest,nil,nil,newMsg.Payload)
+			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
+				// if response topic is not set , sending back to default application event topic
+				fc.mqt.Publish(adr,msg)
+			}
+
+		case "cmd.app.get_state":
+			mode,err := newMsg.Payload.GetStringValue()
+			if err != nil {
+				log.Error("Incorrect request format ")
+				return
+			}
+
+		case "cmd.config.extended_set":
+			type ConfigRequest struct {
+				Param1 bool `json:"param_1"`
+				Param2 string `json:"param_2"`
+			}
+			confReq := ConfigRequest{}
+			err :=newMsg.Payload.GetObjectValue(&confReq)
+			if err != nil {
+				// TODO: This is an example . Add your logic here or remove
+				return
+			}
+			log.Debugf("App reconfigured . New parameters : %v",confReq)
+			// TODO: This is an example . Add your logic here or remove
+
+			configReport := model.ConfigReport{
+				OpStatus: "OK",
+				AppState:  *fc.appLifecycle.GetAllStates(),
+			}
+
+			msg := fimpgo.NewMessage("evt.app.manifest_report",model.ServiceName,fimpgo.VTypeObject,configReport,nil,nil,newMsg.Payload)
+			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
+				// if response topic is not set , sending back to default application event topic
+				fc.mqt.Publish(adr,msg)
+			}
 
 		case "cmd.log.set_level":
 			level , err :=newMsg.Payload.GetStringValue()
@@ -117,24 +151,9 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 			log.Info("Log level updated to = ",logLevel)
 
 		case "cmd.system.connect":
-			_, err := newMsg.Payload.GetStrMapValue()
 			var errStr string
 			status := "ok"
-			//if err != nil {
-			//	log.Error("Incorrect login message ")
-			//	errStr = err.Error()
-			//}
-			//host,_ := reqVal["host"]
-			//username,_ := reqVal["username"]
-			//password,_ := reqVal["password"]
-
-			//if username != ""{
 			fc.appLifecycle.PublishEvent(model.EventConfigured,"from-fimp-router",nil)
-			//}
-			fc.configs.SaveToFile()
-			if err != nil {
-				status = "error"
-			}
 			val := map[string]string{"status":status,"error":errStr}
 			msg := fimpgo.NewStrMapMessage("evt.system.connect_report",model.ServiceName,val,nil,nil,newMsg.Payload)
 			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
@@ -142,13 +161,13 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 			}
 
 		case "cmd.network.get_all_nodes":
-			// TODO: Add your logic here
+			// TODO: This is an example . Add your logic here or remove
 		case "cmd.thing.get_inclusion_report":
 			//nodeId , _ := newMsg.Payload.GetStringValue()
-			// TODO: Add your logic here
+			// TODO: This is an example . Add your logic here or remove
 		case "cmd.thing.inclusion":
 			//flag , _ := newMsg.Payload.GetBoolValue()
-			// TODO: Add your logic here
+			// TODO: This is an example . Add your logic here or remove
 		case "cmd.thing.delete":
 			// remove device from network
 			val,err := newMsg.Payload.GetStrMapValue()
@@ -158,14 +177,15 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 			}
 			deviceId , ok := val["address"]
 			if ok {
-				// TODO: Add your logic here
+				// TODO: This is an example . Add your logic here or remove
 				log.Info(deviceId)
 			}else {
 				log.Error("Incorrect address")
 
 			}
 		case "cmd.state.get_full_report":
-			val := map[string]string{"app":string(fc.appLifecycle.CurrentState()),"connection":string(fc.appLifecycle.ConnectivityState())}
+			// TODO: This is an example . Add your logic here or remove
+			val := map[string]string{"app":string(fc.appLifecycle.AppState()),"connection":string(fc.appLifecycle.ConnectionState())}
 			msg := fimpgo.NewStrMapMessage("evt.state.full_report",model.ServiceName,val,nil,nil,newMsg.Payload)
 			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
 				fc.mqt.Publish(adr,msg)

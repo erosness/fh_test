@@ -80,7 +80,7 @@ func main() {
 	//------------------ Sample code --------------------------------------
 
 	for {
-		appLifecycle.WaitForState("main", model.StateRunning)
+		appLifecycle.WaitForState("main", model.AppStateRunning)
 		// Configure custom resources here
 		//if err := conFimpRouter.Start(); err !=nil {
 		//	appLifecycle.PublishEvent(model.EventConfigError,"main",nil)
@@ -88,7 +88,7 @@ func main() {
 		//	appLifecycle.WaitForState(model.StateConfiguring,"main")
 		//}
 		//TODO: Add logic here
-		appLifecycle.WaitForState(model.StateConfiguring,"main")
+		appLifecycle.WaitForState(model.AppStateNotConfigured,"main")
 	}
 
 	mqtt.Stop()

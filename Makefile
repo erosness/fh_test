@@ -27,42 +27,30 @@ package-tar:
 	tar cvzf thingsplex_service_template_$(version).tar.gz thingsplex_service_template VERSION
 
 clean-deb:
-	find package/debian_tp -name ".DS_Store" -delete
-	find package/debian_tp -name "delete_me" -delete
-	find package/debian_fh -name ".DS_Store" -delete
-	find package/debian_fh -name "delete_me" -delete
+	find package/debian -name ".DS_Store" -delete
+	find package/debian -name "delete_me" -delete
+	find package/debian -name ".DS_Store" -delete
+	find package/debian -name "delete_me" -delete
 
 package-deb-doc-tp:clean-deb
 	@echo "Packaging application using Thingsplex debian package layout"
-	chmod a+x package/debian_tp/DEBIAN/*
-	cp ./src/thingsplex_service_template package/debian_tp/opt/thingsplex/thingsplex_service_template
-	cp VERSION package/debian_tp/opt/thingsplex/thingsplex_service_template
-	docker run --rm -v ${working_dir}:/build -w /build --name debuild debian dpkg-deb --build package/debian_tp
-	@echo "Done"
-
-package-deb-doc-fh:clean-deb
-	@echo "Packaging application using Futurehome debian package layout"
-	chmod a+x package/debian_fh/DEBIAN/*
-	cp ./src/thingsplex_service_template package/debian_fh/usr/bin/thingsplex_service_template
-	cp VERSION package/debian_fh/var/lib/futurehome/thingsplex_service_template
-	docker run --rm -v ${working_dir}:/build -w /build --name debuild debian dpkg-deb --build package/debian_fh
+	chmod a+x package/debian/DEBIAN/*
+	cp ./src/thingsplex_service_template package/debian/opt/thingsplex/thingsplex_service_template
+	cp VERSION package/debian/opt/thingsplex/thingsplex_service_template
+	docker run --rm -v ${working_dir}:/build -w /build --name debuild debian dpkg-deb --build package/debian
 	@echo "Done"
 
 package-docker-amd:build-go-amd
 	cp ./src/thingsplex_service_template package/docker/service
 	cd ./package/docker;docker build -t thingsplex_service_template .
 
-deb-arm-fh : clean configure-arm build-go-arm package-deb-doc-fh
-	@echo "Building Futurehome ARM package"
-	mv package/debian_fh.deb package/build/thingsplex_service_template_$(version)_armhf.deb
-
 deb-arm-tp : clean configure-arm build-go-arm package-deb-doc-tp
 	@echo "Building Thingsplex ARM package"
-	mv package/debian_tp.deb package/build/thingsplex_service_template_$(version)_armhf.deb
+	mv package/debian.deb package/build/thingsplex_service_template_$(version)_armhf.deb
 
 deb-amd : configure-amd64 build-go-amd package-deb-doc-tp
 	@echo "Building Thingsplex AMD package"
-	mv package/debian_tp.deb thingsplex_service_template_$(version)_amd64.deb
+	mv package/debian.deb thingsplex_service_template_$(version)_amd64.deb
 
 upload :
 	@echo "Uploading the package to remote host"

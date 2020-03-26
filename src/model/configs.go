@@ -63,3 +63,8 @@ func (cf *Configs) IsConfigured()bool {
 	// TODO : Add logic here
 	return true
 }
+
+type ConfigReport struct {
+	OpStatus string `json:"op_status"`
+	AppState AppStates `json:"app_state"`
+}
