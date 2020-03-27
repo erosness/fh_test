@@ -55,6 +55,7 @@ func main() {
 
 	SetupLog(configs.LogFile, configs.LogLevel, configs.LogFormat)
 	log.Info("--------------Starting thingsplex_service_template----------------")
+	log.Info("Work directory : ",configs.WorkDir)
 	appLifecycle.PublishEvent(model.EventConfiguring, "main", nil)
 
 	mqtt := fimpgo.NewMqttTransport(configs.MqttServerURI, configs.MqttClientIdPrefix, configs.MqttUsername, configs.MqttPassword, true, 1, 1)
@@ -76,6 +77,7 @@ func main() {
 	} else {
 		log.Info("Connected")
 	}
+	appLifecycle.SetAppState(model.AppStateRunning,nil)
 	//------------------ Sample code --------------------------------------
 
 	for {

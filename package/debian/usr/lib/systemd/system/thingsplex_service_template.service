@@ -3,7 +3,7 @@ Description=thingsplex_service_template
 
 [Service]
 Type=simple
-ExecStart=/opt/thingsplex/thingsplex_service_template/thingsplex_service_template -c config.json
+ExecStart=/opt/thingsplex/thingsplex_service_template/thingsplex_service_template -c data/config.json
 User=thingsplex_service_template
 WorkingDirectory=/opt/thingsplex/thingsplex_service_template
 Restart=always

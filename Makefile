@@ -32,7 +32,7 @@ clean-deb:
 	find package/debian -name ".DS_Store" -delete
 	find package/debian -name "delete_me" -delete
 
-package-deb-doc-tp:clean-deb
+package-deb-doc:clean-deb
 	@echo "Packaging application using Thingsplex debian package layout"
 	chmod a+x package/debian/DEBIAN/*
 	cp ./src/thingsplex_service_template package/debian/opt/thingsplex/thingsplex_service_template
@@ -44,11 +44,11 @@ package-docker-amd:build-go-amd
 	cp ./src/thingsplex_service_template package/docker/service
 	cd ./package/docker;docker build -t thingsplex_service_template .
 
-deb-arm-tp : clean configure-arm build-go-arm package-deb-doc-tp
+deb-arm : clean configure-arm build-go-arm package-deb-doc
 	@echo "Building Thingsplex ARM package"
 	mv package/debian.deb package/build/thingsplex_service_template_$(version)_armhf.deb
 
-deb-amd : configure-amd64 build-go-amd package-deb-doc-tp
+deb-amd : configure-amd64 build-go-amd package-deb-doc
 	@echo "Building Thingsplex AMD package"
 	mv package/debian.deb thingsplex_service_template_$(version)_amd64.deb
 
@@ -60,11 +60,9 @@ remote-install : upload
 	@echo "Uploading and installing the package on remote host"
 	ssh -t $(remote_host) "sudo dpkg -i thingsplex_service_template_$(version)_armhf.deb"
 
-deb-tp-remote-install : deb-arm-tp remote-install
+deb-remote-install : deb-arm remote-install
 	@echo "Package was built and installed on remote host"
 
-deb-fh-remote-install : deb-arm-fh remote-install
-	@echo "Package was built and installed on remote host"
 
 run :
 	cd ./src; go run service.go -c testdata/config.json;cd ../

@@ -5,6 +5,7 @@ import (
 	"github.com/futurehomeno/fimpgo"
 	log "github.com/sirupsen/logrus"
 	"github.com/thingsplex/thingsplex_service_template/model"
+	"path/filepath"
 	"strings"
 )
 
@@ -93,7 +94,11 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 				return
 			}
 			manifest := model.NewManifest()
-			manifest.LoadFromFile("../testdata/app-manifest.json")
+			err = manifest.LoadFromFile(filepath.Join(fc.configs.GetDefaultDir(),"app-manifest.json"))
+			if err != nil {
+				log.Error("Failed to load manifest file .Error :",err.Error())
+				return
+			}
 			if mode == "manifest_and_states" {
 				manifest.AppState = *fc.appLifecycle.GetAllStates()
 			}
@@ -118,12 +123,15 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 			}
 
 		case "cmd.config.extended_set":
-			err :=newMsg.Payload.GetObjectValue(fc.configs)
+			conf := model.Configs{}
+			err :=newMsg.Payload.GetObjectValue(&conf)
 			if err != nil {
 				// TODO: This is an example . Add your logic here or remove
 				log.Error("Can't parse configuration object")
 				return
 			}
+			fc.configs.Param1 = conf.Param1
+			fc.configs.Param2 = conf.Param2
 			fc.configs.SaveToFile()
 			log.Debugf("App reconfigured . New parameters : %v",fc.configs)
 			// TODO: This is an example . Add your logic here or remove

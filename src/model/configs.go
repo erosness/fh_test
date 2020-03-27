@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"io/ioutil"
+	"path/filepath"
 	"time"
 )
 
@@ -18,8 +19,11 @@ type Configs struct {
 	LogFile               string `json:"log_file"`
 	LogLevel              string `json:"log_level"`
 	LogFormat             string `json:"log_format"`
+	WorkDir               string `json:"work_dir"`
 	ConfiguredAt          string `json:"configured_at"`
 	ConfiguredBy          string `json:"configured_by"`
+	Param1                bool   `json:"param_1"`
+	Param2                string `json:"param_2"`
 }
 
 func NewConfigs(path string) *Configs {
@@ -50,13 +54,24 @@ func (cf *Configs) SaveToFile() error {
 	return err
 }
 
+func (cf *Configs) GetDataDir()string {
+	return filepath.Join(cf.WorkDir,"data")
+}
+
+func (cf *Configs) GetDefaultDir()string {
+	return filepath.Join(cf.WorkDir,"defaults")
+}
+
 func (cf *Configs) InitDefault() {
 	cf.InstanceAddress = "1"
 	cf.MqttServerURI = "tcp://localhost:1883"
 	cf.MqttClientIdPrefix = "thingsplex_service_template"
 	cf.LogFile = "/var/log/thingsplex/thingsplex_service_template/thingsplex_service_template.log"
-	cf.LogLevel = "info"
+	cf.WorkDir = "/opt/thingsplex/thingsplex_service_template"
+	cf.LogLevel = "debug"
 	cf.LogFormat = "text"
+	cf.Param1 = true
+	cf.Param2 = "test"
 }
 
 func (cf *Configs) IsConfigured()bool {

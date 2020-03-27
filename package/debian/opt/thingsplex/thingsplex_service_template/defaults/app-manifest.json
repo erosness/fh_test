@@ -30,7 +30,7 @@
     },
     {
       "id": "param_3",
-      "label": "Parameter 3",
+      "label": {"en": "Parameter 3"},
       "val_t": "str_map",
       "ui": {
         "type": "multi_select",

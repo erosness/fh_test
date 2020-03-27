@@ -76,7 +76,12 @@ type Lifecycle struct {
 	configState      State
 }
 func NewAppLifecycle() *Lifecycle {
-	return &Lifecycle{systemEventBus: make(map[string]SystemEventChannel)}
+	lf := &Lifecycle{systemEventBus: make(map[string]SystemEventChannel)}
+	lf.appState = AppStateStarting
+	lf.authState = AuthStateNA
+	lf.configState = ConfigStateNotConfigured
+	lf.connectionState = ConnStateNA
+	return lf
 }
 
 func (al *Lifecycle) GetAllStates() *AppStates {
@@ -191,7 +196,7 @@ func (al *Lifecycle) processEvent(event SystemEvent) {
 
 // WaitForState blocks until target state is reached
 func (al *Lifecycle) WaitForState(subId string, targetState State) {
-	log.Debugf("<sysEvt> Waiting from event = %s , current state = %s", targetState, al.AppState())
+	log.Debugf("<sysEvt> Waiting for state = %s , current state = %s", targetState, al.AppState())
 	if al.AppState() == targetState {
 		return
 	}
