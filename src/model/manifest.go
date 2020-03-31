@@ -55,14 +55,22 @@ type AppConfigUI struct {
 }
 
 type UIButton struct {
-	ID    string `json:"id"`
+	ID    string            `json:"id"`
 	Label MultilingualLabel `json:"label"`
-	Req struct {
-		Serv  string      `json:"serv"`
-		IntfT string      `json:"intf_t"`
-		Val   interface{} `json:"val"`
+	Req   struct {
+		Serv  string `json:"serv"`
+		IntfT string `json:"intf_t"`
+		Val   string `json:"val"`
 	} `json:"req"`
 	ReloadConfig bool `json:"reload_config"`
+}
+
+type ButtonActionResponse struct {
+	Operation       string `json:"op"`
+	OperationStatus string `json:"op_status"`
+	Next            string `json:"next"`
+	ErrorCode       string `json:"error_code"`
+	ErrorText       string `json:"error_text"`
 }
 
 type AppUBLock struct {

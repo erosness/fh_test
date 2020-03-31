@@ -70,7 +70,7 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 				return
 			}
 			status := model.AuthStatus{
-				Status:    "AUTHENTICATED",
+				Status:    model.AuthStateAuthenticated,
 				ErrorText: "",
 				ErrorCode: "",
 			}
@@ -80,7 +80,32 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 				status.Status = "ERROR"
 				status.ErrorText = "Empty username or password"
 			}
+			fc.appLifecycle.SetAuthState(model.AuthStateAuthenticated)
+			msg := fimpgo.NewMessage("evt.auth.status_report",model.ServiceName,fimpgo.VTypeObject,status,nil,nil,newMsg.Payload)
+			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
+				// if response topic is not set , sending back to default application event topic
+				fc.mqt.Publish(adr,msg)
+			}
 
+		case "cmd.auth.set_tokens":
+			authReq := model.SetTokens{}
+			err := newMsg.Payload.GetObjectValue(&authReq)
+			if err != nil {
+				log.Error("Incorrect login message ")
+				return
+			}
+			status := model.AuthStatus{
+				Status:    model.AuthStateAuthenticated,
+				ErrorText: "",
+				ErrorCode: "",
+			}
+			if authReq.AccessToken != "" && authReq.RefreshToken != ""{
+				// TODO: This is an example . Add your logic here or remove
+			}else {
+				status.Status = "ERROR"
+				status.ErrorText = "Empty username or password"
+			}
+			fc.appLifecycle.SetAuthState(model.AuthStateAuthenticated)
 			msg := fimpgo.NewMessage("evt.auth.status_report",model.ServiceName,fimpgo.VTypeObject,status,nil,nil,newMsg.Payload)
 			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
 				// if response topic is not set , sending back to default application event topic
@@ -99,8 +124,9 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 				log.Error("Failed to load manifest file .Error :",err.Error())
 				return
 			}
-			if mode == "manifest_and_states" {
+			if mode == "manifest_state" {
 				manifest.AppState = *fc.appLifecycle.GetAllStates()
+				manifest.ConfigState = fc.configs
 			}
 			msg := fimpgo.NewMessage("evt.app.manifest_report",model.ServiceName,fimpgo.VTypeObject,manifest,nil,nil,newMsg.Payload)
 			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
@@ -158,13 +184,34 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 			}
 			log.Info("Log level updated to = ",logLevel)
 
-		case "cmd.system.connect":
+		case "cmd.system.reconnect":
 			// This is optional operation.
-			var errStr string
-			status := "ok"
 			fc.appLifecycle.PublishEvent(model.EventConfigured,"from-fimp-router",nil)
-			val := map[string]string{"status":status,"error":errStr}
-			msg := fimpgo.NewStrMapMessage("evt.system.connect_report",model.ServiceName,val,nil,nil,newMsg.Payload)
+			//val := map[string]string{"status":status,"error":errStr}
+			val := model.ButtonActionResponse{
+				Operation:       "cmd.system.reconnect",
+				OperationStatus: "ok",
+				Next:            "config",
+				ErrorCode:       "",
+				ErrorText:       "",
+			}
+			msg := fimpgo.NewMessage("evt.app.config_action_report",model.ServiceName,fimpgo.VTypeObject,val,nil,nil,newMsg.Payload)
+			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
+				fc.mqt.Publish(adr,msg)
+			}
+
+		case "cmd.app.factory_reset":
+			val := model.ButtonActionResponse{
+				Operation:       "cmd.app.factory_reset",
+				OperationStatus: "ok",
+				Next:            "config",
+				ErrorCode:       "",
+				ErrorText:       "",
+			}
+			fc.appLifecycle.SetConfigState(model.ConfigStateNotConfigured)
+			fc.appLifecycle.SetAppState(model.AppStateNotConfigured,nil)
+			fc.appLifecycle.SetAuthState(model.AuthStateNotAuthenticated)
+			msg := fimpgo.NewMessage("evt.app.config_action_report",model.ServiceName,fimpgo.VTypeObject,val,nil,nil,newMsg.Payload)
 			if err := fc.mqt.RespondToRequest(newMsg.Payload,msg); err != nil {
 				fc.mqt.Publish(adr,msg)
 			}
