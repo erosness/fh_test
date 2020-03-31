@@ -8,13 +8,14 @@ import (
 )
 
 type Manifest struct {
-	Configs  []AppConfig   `json:"configs"`
-	UIBlocks []AppUBLock   `json:"ui_blocks"`
-	Auth     AppAuth       `json:"auth"`
-	InitFlow []string      `json:"init_flow"`
-	Services []AppServices `json:"services"`
-	AppState AppStates     `json:"app_state"`
-	ConfigState interface{}`json:"config_state"`
+	Configs     []AppConfig   `json:"configs"`
+	UIBlocks    []AppUBLock   `json:"ui_blocks"`
+	UIButtons   []UIButton    `json:"ui_buttons"`
+	Auth        AppAuth       `json:"auth"`
+	InitFlow    []string      `json:"init_flow"`
+	Services    []AppServices `json:"services"`
+	AppState    AppStates     `json:"app_state"`
+	ConfigState interface{}   `json:"config_state"`
 }
 
 type AppConfig struct {
@@ -53,10 +54,22 @@ type AppConfigUI struct {
 	Select interface{} `json:"select"`
 }
 
+type UIButton struct {
+	ID    string `json:"id"`
+	Label MultilingualLabel `json:"label"`
+	Req struct {
+		Serv  string      `json:"serv"`
+		IntfT string      `json:"intf_t"`
+		Val   interface{} `json:"val"`
+	} `json:"req"`
+	ReloadConfig bool `json:"reload_config"`
+}
+
 type AppUBLock struct {
 	Header  MultilingualLabel `json:"label"`
 	Text    MultilingualLabel `json:"text"`
 	Configs []string          `json:"configs"`
+	Buttons []string          `json:"buttons"`
 	Footer  MultilingualLabel `json:"footer"`
 }
 
@@ -79,8 +92,8 @@ func (m *Manifest) LoadFromFile(filePath string) error {
 	return nil
 }
 
-func (m *Manifest)SaveToFile(filePath string) error {
-	flowMetaByte,err := json.Marshal(m)
+func (m *Manifest) SaveToFile(filePath string) error {
+	flowMetaByte, err := json.Marshal(m)
 	if err != nil {
 		log.Error("<manifest> Can't marshal imported file ")
 		return err

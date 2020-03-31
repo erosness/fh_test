@@ -84,12 +84,14 @@
       "header": {"en": "App configuration"},
       "text": {"en": ""},
       "configs": ["param_1","param_2","param_2","reconnect"],
+      "buttons": ["reconnect"],
       "footer": {"en": "footer text"}
     },
     {
       "header": {"en": "Security"},
       "text": {"en": ""},
       "configs": ["param_4"],
+      "buttons": [],
       "footer": {"en": "footer text"}
     }
   ],
