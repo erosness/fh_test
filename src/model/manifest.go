@@ -8,14 +8,14 @@ import (
 )
 
 type Manifest struct {
-	Configs     []AppConfig   `json:"configs"`
-	UIBlocks    []AppUBLock   `json:"ui_blocks"`
-	UIButtons   []UIButton    `json:"ui_buttons"`
-	Auth        AppAuth       `json:"auth"`
-	InitFlow    []string      `json:"init_flow"`
-	Services    []AppServices `json:"services"`
-	AppState    AppStates     `json:"app_state"`
-	ConfigState interface{}   `json:"config_state"`
+	Configs     []AppConfig  `json:"configs"`
+	UIBlocks    []AppUBLock  `json:"ui_blocks"`
+	UIButtons   []UIButton   `json:"ui_buttons"`
+	Auth        AppAuth      `json:"auth"`
+	InitFlow    []string     `json:"init_flow"`
+	Services    []AppService `json:"services"`
+	AppState    AppStates    `json:"app_state"`
+	ConfigState interface{}  `json:"config_state"`
 }
 
 type AppConfig struct {
@@ -40,7 +40,7 @@ type AppAuth struct {
 	AuthEndpoint string `json:"auth_endpoint"`
 }
 
-type AppServices struct {
+type AppService struct {
 	Name       string               `json:"name"`
 	Alias      string               `json:"alias"`
 	Address    string               `json:"address"`
