@@ -32,8 +32,10 @@ type MultilingualLabel map[string]string
 
 type AppAuth struct {
 	Type         string `json:"type"`
+	CodeGrantLoginPageUrl string `json:"code_grant_login_page_url"`
 	RedirectURL  string `json:"redirect_url"`
 	ClientID     string `json:"client_id"`
+	Secret       string `json:"secret"`
 	PartnerID    string `json:"partner_id"`
 	AuthEndpoint string `json:"auth_endpoint"`
 }
@@ -74,7 +76,7 @@ type ButtonActionResponse struct {
 }
 
 type AppUBLock struct {
-	Header  MultilingualLabel `json:"label"`
+	Header  MultilingualLabel `json:"header"`
 	Text    MultilingualLabel `json:"text"`
 	Configs []string          `json:"configs"`
 	Buttons []string          `json:"buttons"`

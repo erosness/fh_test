@@ -2,7 +2,10 @@ package model
 
 import (
 	"encoding/json"
+	log "github.com/sirupsen/logrus"
+	"github.com/thingsplex/thingsplex_service_template/utils"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"time"
 )
@@ -60,6 +63,14 @@ func (cf *Configs) GetDataDir()string {
 
 func (cf *Configs) GetDefaultDir()string {
 	return filepath.Join(cf.WorkDir,"defaults")
+}
+
+func (cf * Configs) LoadDefaults()error {
+	configFile := filepath.Join(cf.WorkDir,"data","config.json")
+	os.Remove(configFile)
+	log.Info("Config file doesn't exist.Loading default config")
+	defaultConfigFile := filepath.Join(cf.WorkDir,"defaults","config.json")
+	return utils.CopyFile(defaultConfigFile,configFile)
 }
 
 func (cf *Configs) InitDefault() {
