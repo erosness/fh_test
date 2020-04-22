@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/thingsplex/thingsplex_service_template/utils"
 	"io/ioutil"
@@ -22,15 +23,26 @@ type Configs struct {
 	LogFile               string `json:"log_file"`
 	LogLevel              string `json:"log_level"`
 	LogFormat             string `json:"log_format"`
-	WorkDir               string `json:"work_dir"`
+	WorkDir               string `json:"-"`
 	ConfiguredAt          string `json:"configured_at"`
 	ConfiguredBy          string `json:"configured_by"`
 	Param1                bool   `json:"param_1"`
 	Param2                string `json:"param_2"`
 }
 
-func NewConfigs(path string) *Configs {
-	return &Configs{path:path}
+func NewConfigs(workDir string) *Configs {
+	conf := &Configs{WorkDir: workDir}
+	conf.path = filepath.Join(workDir,"data","config.json")
+	if !utils.FileExists(conf.path) {
+		log.Info("Config file doesn't exist.Loading default config")
+		defaultConfigFile := filepath.Join(workDir,"defaults","config.json")
+		err := utils.CopyFile(defaultConfigFile,conf.path)
+		if err != nil {
+			fmt.Print(err)
+			panic("Can't copy config file.")
+		}
+	}
+	return conf
 }
 
 func (cf * Configs) LoadFromFile() error {

@@ -1,4 +1,4 @@
 FROM scratch
 ADD service /
-ADD config.json /
+ADD defaults/config.json /
 CMD ["/service", "-c", "config.json"]

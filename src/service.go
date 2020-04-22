@@ -8,52 +8,28 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/thingsplex/thingsplex_service_template/model"
 	"github.com/thingsplex/thingsplex_service_template/router"
-	"gopkg.in/natefinch/lumberjack.v2"
+	"github.com/thingsplex/thingsplex_service_template/utils"
 	"time"
 )
 
-func SetupLog(logfile string, level string, logFormat string) {
-	if logFormat == "json" {
-		log.SetFormatter(&log.JSONFormatter{TimestampFormat: "2006-01-02 15:04:05.999"})
-	} else {
-		log.SetFormatter(&log.TextFormatter{FullTimestamp: true, ForceColors: true, TimestampFormat: "2006-01-02T15:04:05.999"})
-	}
-
-	logLevel, err := log.ParseLevel(level)
-	if err == nil {
-		log.SetLevel(logLevel)
-	} else {
-		log.SetLevel(log.DebugLevel)
-	}
-
-	if logfile != "" {
-		l := lumberjack.Logger{
-			Filename:   logfile,
-			MaxSize:    5, // megabytes
-			MaxBackups: 2,
-		}
-		log.SetOutput(&l)
-	}
-}
-
 func main() {
-	var configFile string
-	flag.StringVar(&configFile, "c", "", "Config file")
+	var workDir string
+	flag.StringVar(&workDir, "c", "", "Work dir")
 	flag.Parse()
-	if configFile == "" {
-		configFile = "./config.json"
+	if workDir == "" {
+		workDir = "./"
 	} else {
-		fmt.Println("Loading configs from file ", configFile)
+		fmt.Println("Work dir ", workDir)
 	}
 	appLifecycle := model.NewAppLifecycle()
-	configs := model.NewConfigs(configFile)
+	configs := model.NewConfigs(workDir)
 	err := configs.LoadFromFile()
 	if err != nil {
 		fmt.Print(err)
 		panic("Can't load config file.")
 	}
 
-	SetupLog(configs.LogFile, configs.LogLevel, configs.LogFormat)
+	utils.SetupLog(configs.LogFile, configs.LogLevel, configs.LogFormat)
 	log.Info("--------------Starting thingsplex_service_template----------------")
 	log.Info("Work directory : ",configs.WorkDir)
 	appLifecycle.PublishEvent(model.EventConfiguring, "main", nil)
