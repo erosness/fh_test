@@ -162,7 +162,7 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 			log.Debugf("App reconfigured . New parameters : %v",fc.configs)
 			// TODO: This is an example . Add your logic here or remove
 			configReport := model.ConfigReport{
-				OpStatus: "OK",
+				OpStatus: "ok",
 				AppState:  *fc.appLifecycle.GetAllStates(),
 			}
 			msg := fimpgo.NewMessage("evt.app.config_report",model.ServiceName,fimpgo.VTypeObject,configReport,nil,nil,newMsg.Payload)

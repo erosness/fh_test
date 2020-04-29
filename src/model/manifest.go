@@ -29,6 +29,14 @@ type AppConfig struct {
 	Hidden      bool              `json:"hidden"` //
 }
 
+func (b *AppConfig) Hide() {
+	b.Hidden = true
+}
+
+func (b *AppConfig) Show() {
+	b.Hidden = true
+}
+
 type MultilingualLabel map[string]string
 
 type AppAuth struct {
@@ -68,6 +76,14 @@ type UIButton struct {
 	Hidden       bool `json:"hidden"`
 }
 
+func (b *UIButton) Hide() {
+	b.Hidden = true
+}
+
+func (b *UIButton) Show() {
+	b.Hidden = true
+}
+
 type ButtonActionResponse struct {
 	Operation       string `json:"op"`
 	OperationStatus string `json:"op_status"`
@@ -85,6 +101,15 @@ type AppUBLock struct {
 	Footer  MultilingualLabel `json:"footer"`
 	Hidden  bool              `json:"hidden"`
 }
+
+func (b *AppUBLock) Hide() {
+	b.Hidden = true
+}
+
+func (b *AppUBLock) Show() {
+	b.Hidden = true
+}
+
 
 func NewManifest() *Manifest {
 	return &Manifest{}
