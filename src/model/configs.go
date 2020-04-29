@@ -48,8 +48,7 @@ func NewConfigs(workDir string) *Configs {
 func (cf * Configs) LoadFromFile() error {
 	configFileBody, err := ioutil.ReadFile(cf.path)
 	if err != nil {
-		cf.InitDefault()
-		return cf.SaveToFile()
+		return err
 	}
 	err = json.Unmarshal(configFileBody, cf)
 	if err != nil {
@@ -83,18 +82,6 @@ func (cf * Configs) LoadDefaults()error {
 	log.Info("Config file doesn't exist.Loading default config")
 	defaultConfigFile := filepath.Join(cf.WorkDir,"defaults","config.json")
 	return utils.CopyFile(defaultConfigFile,configFile)
-}
-
-func (cf *Configs) InitDefault() {
-	cf.InstanceAddress = "1"
-	cf.MqttServerURI = "tcp://localhost:1883"
-	cf.MqttClientIdPrefix = "thingsplex_service_template"
-	cf.LogFile = "/var/log/thingsplex/thingsplex_service_template/thingsplex_service_template.log"
-	cf.WorkDir = "/opt/thingsplex/thingsplex_service_template"
-	cf.LogLevel = "debug"
-	cf.LogFormat = "text"
-	cf.Param1 = true
-	cf.Param2 = "test"
 }
 
 func (cf *Configs) IsConfigured()bool {

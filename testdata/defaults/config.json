@@ -4,7 +4,7 @@
   "mqtt_client_id_prefix":"thingsplex_service_template",
   "mqtt_server_username":"",
   "mqtt_server_password":"",
-  "work_dir": "../testdata/",
+  "work_dir": "../testdata",
   "log_file": "",
   "log_level": "debug",
   "log_format": "text"

@@ -65,7 +65,7 @@ deb-remote-install : deb-arm remote-install
 
 
 run :
-	cd ./src; go run service.go -c testdata/config.json;cd ../
+	cd ./src; go run service.go -c ../testdata;cd ../
 
 
 .phony : clean

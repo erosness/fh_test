@@ -5,13 +5,14 @@
       "label": {"en": "Param 1"},
       "val_t": "bool",
       "ui": {
-        "type": "radio",
+        "type": "list_radio",
         "select": [{"val": true,"label": {"en": "Option 1"}},{"val": false,"label": {"en": "Option 2"}}]
       },
       "val": {
         "default": false
       },
       "is_required": true,
+      "hidden":false,
       "config_point": "init"
     },
     {
@@ -19,13 +20,14 @@
       "label": {"en": "Parameter 2"},
       "val_t": "string",
       "ui": {
-        "type": "select",
+        "type": "select_horizontal",
         "select": [{"val": "o1","label": {"en": "Option 1"}},{"val": "o2","label":{"en": "Option 2"}}]
       },
       "val": {
         "default": "o1"
       },
       "is_required": true,
+      "hidden":false,
       "config_point": "any"
     },
     {
@@ -33,13 +35,14 @@
       "label": {"en": "Parameter 3"},
       "val_t": "str_map",
       "ui": {
-        "type": "multi_select",
+        "type": "list_checkbox",
         "select": [{"val": "o1","label": {"en": "Option 1"}},{"val": "o2","label": {"en": "Option 1"}},{"val":"o3", "label": {"en": "Option 3"}}]
       },
       "val": {
         "default": ["o1","o2"]
       },
       "is_required": true,
+      "hidden":false,
       "config_point": "init"
     },
     {
@@ -47,12 +50,13 @@
       "label": {"en": "Please enter the code into Apple Home app"},
       "val_t": "string",
       "ui": {
-        "type": "readonly"
+        "type": "input_readonly"
       },
       "val": {
         "default": ""
       },
       "is_required": false,
+      "hidden":false,
       "config_point": "connection"
     }
   ],
@@ -63,9 +67,9 @@
       "req": {
         "serv":"hue",
         "intf_t": "cmd.system.sync",
-        "val": null
+        "val": "action1"
       },
-      "reload_config": true
+      "hidden":false
     },
     {
       "id":"reconnect",
@@ -73,30 +77,55 @@
       "req": {
         "serv":"hue",
         "intf_t": "cmd.system.reconnect",
-        "val": null
+        "val": "action2"
       },
-      "reload_config": true
+      "hidden":false
+    },{
+      "id":"factory_reset",
+      "label": {"en": "Factory reset"},
+      "req": {
+        "serv":"app-one",
+        "intf_t": "cmd.app.factory_reset",
+        "val": "action2"
+      },
+      "hidden":false
     }
 
   ],
   "ui_blocks": [
     {
+      "id": "block_1",
       "header": {"en": "App configuration"},
       "text": {"en": ""},
-      "configs": ["param_1","param_2","param_2","reconnect"],
-      "footer": {"en": "footer text"}
+      "configs": ["param_1","param_2","param_2"],
+      "buttons": ["reconnect"],
+      "footer": {"en": "footer text"},
+      "hidden":false
     },
     {
+      "id": "block_2",
       "header": {"en": "Security"},
       "text": {"en": ""},
       "configs": ["param_4"],
-      "footer": {"en": "footer text"}
+      "buttons": [],
+      "footer": {"en": "footer text"},
+      "hidden":false
+    },{
+      "id": "block_3",
+      "header": {"en": "Factory reset"},
+      "text": {"en": "The operation can't be undone"},
+      "configs": [],
+      "buttons": ["factory_reset"],
+      "footer": {"en": ""},
+      "hidden":false
     }
   ],
   "auth": {
-    "type": "oauth2_code_grant",
+    "type": "password",
+    "code_grant_login_page_url" : "",
     "redirect_url": "",
     "client_id": "",
+    "secret": "",
     "partner_id": "",
     "auth_endpoint": ""
   },
