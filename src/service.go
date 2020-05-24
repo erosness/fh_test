@@ -42,7 +42,9 @@ func main() {
 
 	fimpRouter := router.NewFromFimpRouter(mqtt,appLifecycle,configs)
 	fimpRouter.Start()
-
+	//------------------ Remote API check -- !!!!IMPORTANT!!!!-------------
+	// The app MUST perform remote API availability check.
+	// During gateway boot process the app might be started before network is initialized or another local app booted.
 	//------------------ Sample code --------------------------------------
 
 	msg := fimpgo.NewFloatMessage("evt.sensor.report", "temp_sensor", float64(35.5), nil, nil, nil)
