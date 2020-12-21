@@ -20,4 +20,3 @@ type AuthStatus struct {
 	ErrorText string `json:"error_text"`
 	ErrorCode string `json:"error_code"`
 }
-

@@ -16,7 +16,6 @@ func GetDiscoveryResource() discovery.Resource {
 			Technology:            "thingsplex_service_template",
 			FwVersion:             "all",
 			NetworkManagementType: "inclusion_exclusion",
-			Services:              nil,   // Services must be defines in manifest
 		},
 	}
 
