@@ -215,6 +215,8 @@ func (fc *FromFimpRouter) routeFimpMessage(newMsg *fimpgo.Message) {
 			if err := fc.mqt.RespondToRequest(newMsg.Payload, msg); err != nil {
 				fc.mqt.Publish(adr, msg)
 			}
+		case "cmd.app.uninstall":
+			// TODO: The message is sent to the app from fhbutler before performing package uninstall operation
 
 		case "cmd.network.get_all_nodes":
 			// TODO: This is an example . Add your logic here or remove
