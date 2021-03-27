@@ -1,13 +1,13 @@
 import sys
 
 def set_deb_control(version , arch,file_name):
-    template = "Package: thingsplex_service_template\n"
+    template = "Package: nibeuplink_service\n"
     template+= "Version: "+version+"\n"
-    template+= "Replaces: thingsplex_service_template\n"
+    template+= "Replaces: nibeuplink_service\n"
     template+= "Section: non-free/misc\n"
     template+= "Priority: optional\n"
     template+= "Architecture: "+arch+"\n"
-    template+= "Maintainer: your namae <dev@your-app.com>\n"
+    template+= "Maintainer: Erik Rosness <erik@rosness.no>\n"
     template+= "Description: . futurehome app  \n"
 
     f = open(file_name,"w")
